@@ -49,10 +49,115 @@ const initial=[
 ];
 let products=[]; const API_URL='https://script.google.com/macros/s/AKfycbxziLG05oJvfOr3hRMW8rdXzSlAhorMbHXW30_7DZsygXGmAJ3mYcE5bOZvRxZikuky/exec';
 const $=id=>document.getElementById(id);const euro=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function persist(){ /* Catalogo online in sola lettura: le modifiche si fanno nel foglio Google. */ }function statusClass(s){return s==='Ultimi pezzi'?'low':s==='Non disponibile'?'out':s==='Da verificare'?'check':''}
-function normalizzaProdotto(r){const prezzoRaw=String(r.Prezzo??'0').trim().replace(/€|EUR/gi,'').replace(/\s/g,'');let prezzoPulito=prezzoRaw;if(prezzoPulito.includes(',')&&prezzoPulito.includes('.')){prezzoPulito=prezzoPulito.lastIndexOf(',')>prezzoPulito.lastIndexOf('.')?prezzoPulito.replace(/\./g,'').replace(',','.'):prezzoPulito.replace(/,/g,'')}else if(prezzoPulito.includes(',')){prezzoPulito=prezzoPulito.replace(',','.')}const prezzo=Number(prezzoPulito);const cat=String(r.Categoria||'Altro');const icone={'Prima infanzia':'🧸','Costruzioni':'🧱','Bambole e peluche':'🪆','Giochi da tavolo':'🎲','Veicoli':'🚗','Action figure':'🤖','Creatività':'🎨'};return {id:String(r.ID||''),name:String(r.Nome||''),brand:String(r.Marca||''),category:cat,description:String(r.Descrizione||''),age:String(r['Età']||''),price:Number.isFinite(prezzo)?prezzo:0,status:String(r.Disponibilità||'Da verificare'),emoji:icone[cat]||'🧸',visible:true};}
+
+function normalizzaProdotto(r) {
+  const prezzoRaw = String(r.Prezzo ?? '0')
+    .trim()
+    .replace(/€|EUR/gi, '')
+    .replace(/\s/g, '');
+
+  let prezzoPulito = prezzoRaw;
+
+  if (prezzoPulito.includes(',') && prezzoPulito.includes('.')) {
+    prezzoPulito = prezzoPulito.lastIndexOf(',') > prezzoPulito.lastIndexOf('.')
+      ? prezzoPulito.replace(/\./g, '').replace(',', '.')
+      : prezzoPulito.replace(/,/g, '');
+  } else if (prezzoPulito.includes(',')) {
+    prezzoPulito = prezzoPulito.replace(',', '.');
+  }
+
+  const prezzo = Number(prezzoPulito);
+  const cat = String(r.Categoria || 'Altro');
+
+  const icone = {
+    'Prima infanzia': '🧸',
+    'Costruzioni': '🧱',
+    'Bambole e peluche': '🪆',
+    'Giochi da tavolo': '🎲',
+    'Veicoli': '🚗',
+    'Action figure': '🤖',
+    'Creatività': '🎨'
+  };
+
+  return {
+    id: String(r.ID || ''),
+    name: String(r.Nome || ''),
+    brand: String(r.Marca || ''),
+    category: cat,
+    description: String(r.Descrizione || ''),
+    age: String(r['Età'] || ''),
+    price: Number.isFinite(prezzo) ? prezzo : 0,
+    status: String(r.Disponibilità || 'Da verificare'),
+    emoji: icone[cat] || '🧸',
+    photoURL: String(r.FotoURL || '').trim(),
+    visible: String(r.Visibile || 'TRUE').toUpperCase() !== 'FALSE'
+  };
+}
+
 async function caricaCatalogo(){const n=$('connectionNotice');try{const res=await fetch(API_URL,{cache:'no-store'});if(!res.ok)throw new Error('Risposta HTTP '+res.status);const righe=await res.json();if(!Array.isArray(righe))throw new Error('Formato dati non valido');products=righe.map(normalizzaProdotto).filter(p=>p.name);render();n.textContent='Catalogo collegato a Google Sheets. I dati mostrati provengono dal foglio online.';n.style.background='#eaf7ee';n.style.borderColor='#b7e1c1';n.style.color='#185b2a';if(!products.length)n.textContent='Collegamento riuscito, ma non ci sono ancora prodotti visibili nel foglio Google.';}catch(err){console.error(err);products=[];render();n.textContent='Non riesco a leggere il catalogo online. Verifica la connessione e riprova a ricaricare la pagina.';}}
 function categories(){return [...new Set(products.map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'))}function ages(){return [...new Set(products.map(p=>String(p.age||'').trim()).filter(Boolean))].sort((a,b)=>parseInt(a)-parseInt(b))}function drawFilters(){const current=$('categoryFilter').value;const currentAge=$('ageFilter').value;$('ageFilter').innerHTML='<option value="">Tutte le età</option>'+ages().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');$('ageFilter').value=currentAge;$('categoryFilter').innerHTML='<option value="">Tutte le categorie</option>'+categories().map(c=>`<option>${esc(c)}</option>`).join('');$('categoryFilter').value=current;$('chips').innerHTML=['Tutti',...categories()].map(c=>`<button class="chip ${($('categoryFilter').value===''&&c==='Tutti')||$('categoryFilter').value===c?'active':''}" data-cat="${c==='Tutti'?'':esc(c)}">${esc(c)}</button>`).join('');$('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('categoryFilter').value=b.dataset.cat;render()})}
-function render(){drawFilters();const q=$('search').value.trim().toLocaleLowerCase('it');const cat=$('categoryFilter').value;const st=$('statusFilter').value;const age=$('ageFilter').value;const shown=products.filter(p=>(p.visible!==false)&&(!q||[p.name,p.brand,p.description,p.category].some(v=>String(v||'').toLocaleLowerCase('it').includes(q)))&&(!cat||p.category===cat)&&(!age||String(p.age||'').trim()===age)&&(!st||p.status===st));$('catalog').innerHTML=shown.length?shown.map(p=>`<article class="card"><div class="photo" aria-hidden="true">${esc(p.emoji||'🧸')}</div><div class="cardbody"><div class="meta">${esc(p.brand||'Marca non indicata')} · ${esc(p.category||'Altro')}</div><h3>${esc(p.name)}</h3><div class="desc">${esc(p.description||'Dettagli da confermare in negozio.')}</div><div class="price-row"><div class="price">${euro(p.price)}</div><span class="status ${statusClass(p.status)}">${esc(p.status||'Da verificare')}</span></div><div class="age">Età consigliata: ${esc(p.age||'da verificare')}</div></div></article>`).join(''):'<div class="empty">Nessun prodotto trovato. Prova a cambiare ricerca o filtri.</div>';drawAdmin()}
+
+function render() {
+  drawFilters();
+
+  const q = $('search').value.trim().toLocaleLowerCase('it');
+  const cat = $('categoryFilter').value;
+  const st = $('statusFilter').value;
+  const age = $('ageFilter').value;
+
+  const shown = products.filter(p =>
+    p.visible !== false &&
+    (!q || [p.name, p.brand, p.description, p.category]
+      .some(v => String(v || '').toLocaleLowerCase('it').includes(q))) &&
+    (!cat || p.category === cat) &&
+    (!age || String(p.age || '').trim() === age) &&
+    (!st || p.status === st)
+  );
+
+  $('catalog').innerHTML = shown.length
+    ? shown.map(p => {
+        const immagine = p.photoURL
+          ? `<img src="${esc(p.photoURL)}"
+                 alt="${esc(p.name)}"
+                 loading="lazy"
+                 style="width:100%;height:100%;object-fit:contain;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">`
+          : '';
+
+        return `
+          <article class="card">
+            <div class="photo" style="position:relative;">
+              ${immagine}
+              <span style="display:${p.photoURL ? 'none' : 'grid'};
+                position:absolute;inset:0;place-items:center;font-size:68px;">
+                ${esc(p.emoji || '🧸')}
+              </span>
+            </div>
+            <div class="cardbody">
+              <div class="meta">
+                ${esc(p.brand || 'Marca non indicata')} · ${esc(p.category || 'Altro')}
+              </div>
+              <h3>${esc(p.name)}</h3>
+              <div class="desc">
+                ${esc(p.description || 'Dettagli da confermare in negozio.')}
+              </div>
+              <div class="price-row">
+                <div class="price">${euro(p.price)}</div>
+                <span class="status ${statusClass(p.status)}">
+                  ${esc(p.status || 'Da verificare')}
+                </span>
+              </div>
+              <div class="age">
+                Età consigliata: ${esc(p.age || 'da verificare')}
+              </div>
+            </div>
+          </article>`;
+      }).join('')
+    : '<div class="empty">Nessun prodotto trovato. Prova a cambiare ricerca o filtri.</div>';
+
+  drawAdmin();
+}
+
 function clearForm(){ $('productForm').reset();$('editId').value='';$('saveBtn').textContent='Salva prodotto';const m=$('formMessage');if(m){m.style.display='none';m.textContent=''}}function drawAdmin(){const list=$('adminList');list.innerHTML='<h3>Prodotti in archivio ('+products.length+')</h3>'+products.map(p=>`<div class="adminitem"><div><strong>${esc(p.name)}</strong><small>${esc(p.brand||'Marca non indicata')} · ${euro(p.price)} · ${esc(p.status)}</small></div><div class="actions"><button class="secondary smallbtn" data-edit="${esc(p.id)}">Modifica</button><button class="secondary smallbtn" data-delete="${esc(p.id)}">Elimina</button></div></div>`).join('');list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.edit);if(!p)return;$('editId').value=p.id;$('name').value=p.name;$('brand').value=p.brand||'';$('category').value=p.category||'Altro';$('age').value=p.age||'';$('price').value=p.price;$('status').value=p.status||'Da verificare';$('description').value=p.description||'';$('emoji').value=p.emoji||'🧸';$('saveBtn').textContent='Aggiorna prodotto';requestAnimationFrame(()=>{ $('productForm').scrollIntoView({behavior:'smooth',block:'start'}); setTimeout(()=> $('name').focus({preventScroll:true}),350) })});list.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.delete);if(p&&confirm('Eliminare il prodotto demo “'+p.name+'”?')){products=products.filter(x=>x.id!==p.id);persist();render()}})}
 function saveProduct(){const msg=$('formMessage');msg.style.display='block';try{const oldId=$('editId').value;const name=$('name').value.trim();const priceText=$('price').value.trim().replace(',','.');const price=Number(priceText);if(!name){msg.textContent='Inserisci il nome del prodotto.';$('name').focus();return}if(priceText===''||!Number.isFinite(price)||price<0){msg.textContent='Inserisci un prezzo valido, ad esempio 9,90.';$('price').focus();return}const p={id:oldId||(globalThis.crypto?.randomUUID?crypto.randomUUID():'DEMO-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),name,brand:$('brand').value.trim(),category:$('category').value||'Altro',age:$('age').value.trim(),price,status:$('status').value||'Da verificare',description:$('description').value.trim(),emoji:$('emoji').value||'🧸'};if(oldId){products=products.map(x=>x.id===oldId?p:x)}else{products.push(p)}persist();clearForm();render();msg.style.display='block';msg.textContent=oldId?'Prodotto aggiornato correttamente.':'Prodotto aggiunto correttamente.';}catch(err){console.error(err);msg.textContent='Salvataggio non riuscito in questo browser: '+err.message}}$('saveBtn').addEventListener('click',saveProduct);$('productForm').addEventListener('submit',e=>{e.preventDefault();saveProduct()});$('resetBtn').onclick=clearForm;$('search').oninput=render;$('categoryFilter').onchange=render;$('statusFilter').onchange=render;$('ageFilter').onchange=render;
 function csvEscape(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}$('exportBtn').onclick=()=>{const cols=['id','name','brand','category','age','price','status','description','emoji'];const csv=[cols.join(';'),...products.map(p=>cols.map(k=>csvEscape(p[k])).join(';'))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='catalogo-giocattoli-demo.csv';a.click();URL.revokeObjectURL(a.href)};$('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const text=await f.text();const rows=text.replace(/^\ufeff/,'').split(/\r?\n/).filter(Boolean);const parse=line=>{const out=[];let v='',quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'&&quoted&&line[i+1]==='"'){v+='"';i++}else if(c==='"')quoted=!quoted;else if(c===';'&&!quoted){out.push(v);v=''}else v+=c}out.push(v);return out};const heads=parse(rows.shift()).map(x=>x.trim());const incoming=rows.map(line=>{const a=parse(line),o={};heads.forEach((h,i)=>o[h]=a[i]||'');return {id:o.id||'DEMO-'+Date.now()+Math.random(),name:o.name||o['Nome prodotto']||'',brand:o.brand||o['Marca']||'',category:o.category||o['Categoria']||'Altro',age:o.age||o['Età consigliata']||'',price:Number(String(o.price||o['Prezzo (€)']||'0').replace(',','.')),status:o.status||o['Disponibilità']||'Da verificare',description:o.description||o['Descrizione']||'',emoji:o.emoji||'🧸'}}).filter(p=>p.name);if(!incoming.length)throw new Error('Nessun prodotto valido trovato');if(confirm('Importare '+incoming.length+' prodotti? OK = sostituisci catalogo demo, Annulla = aggiungi')){if(!confirm('Confermi di sostituire gli articoli presenti?'))products.push(...incoming);else products=incoming}else products.push(...incoming);persist();render();alert('Importazione completata. Controlla i dati prima di pubblicare.')}catch(err){alert('Importazione non riuscita: '+err.message)}e.target.value=''};
