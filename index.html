@@ -198,6 +198,78 @@ main{max-width:1420px;padding:30px clamp(20px,3vw,48px) 64px}
 @media(prefers-reduced-motion:reduce){.category-worlds .category-tile,.category-worlds .category-tile .tile-icon,.worlds-sparkle{animation:none!important;transition:none!important}}
 
 .load-more-wrap{display:flex;flex-direction:column;align-items:center;gap:7px;margin:24px auto 8px}.load-more-wrap[hidden]{display:none!important}.load-more-products{min-height:48px;padding:12px 24px;border:2px solid #fff;border-radius:999px;background:linear-gradient(100deg,#e8e2ff,#e2f5ff);color:#454482;font:700 15px 'Fredoka','Baloo 2',sans-serif;box-shadow:0 4px 0 #8882bd20}.load-more-products:hover,.load-more-products:focus-visible{background:linear-gradient(100deg,#dcd3ff,#d5efff);outline:3px solid #c6c9f5;outline-offset:2px}.load-more-wrap p{margin:0;color:#77789d;font-size:12px}@media(prefers-reduced-motion:reduce){.load-more-products{transition:none}}
+
+/* Header armonizzato con il resto del catalogo: titolo invariato, sfondo più semplice */
+.top{background:rgba(255,250,240,.78)!important;border-bottom:2px solid #e6dcfb!important;box-shadow:0 5px 18px #7770a10a!important;backdrop-filter:blur(2px)}
+.top:before,.top:after{content:none!important;display:none!important}
+
+/* Hero a tutta sezione: riempie lo spazio del pannello categorie rimosso */
+.fairytale-hero{
+  display:flex!important;
+  width:100%;
+  min-height:360px;
+  box-sizing:border-box;
+  align-items:center;
+  justify-content:center;
+  margin:24px 0 28px;
+  padding:clamp(28px,3.5vw,48px);
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 12% 18%,#fff9d9c9 0,transparent 38%),
+    radial-gradient(ellipse at 90% 82%,#dff5ffd9 0,transparent 42%),
+    linear-gradient(135deg,#e8f4ff 0%,#f2eaff 48%,#fff0f6 100%);
+}
+.fairytale-hero:before{right:-60px;top:-170px;width:460px;height:460px}
+.fairytale-hero .hero-copy{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  max-width:100%;
+  text-align:center;
+}
+.fairytale-hero .hero-copy h2{max-width:1000px}
+.fairytale-hero .hero-copy p{max-width:900px}
+.fairytale-hero .hero-cta{align-self:center}
+.fairytale-hero .hero-badges{justify-content:center;width:100%;max-width:none}
+@media(min-width:900px){
+  .fairytale-hero{min-height:clamp(340px,30vw,440px)}
+  .fairytale-hero .hero-copy h2{font-size:clamp(44px,4.5vw,64px)}
+  .fairytale-hero .hero-copy p{font-size:clamp(17px,1.3vw,20px)}
+  .fairytale-hero .hero-cta{min-width:320px}
+}
+@media(max-width:600px){
+  .fairytale-hero{min-height:0;padding:30px 20px;margin:16px 0 22px;border-radius:26px}
+  .fairytale-hero .hero-copy h2{font-size:clamp(34px,9vw,44px)}
+  .fairytale-hero .hero-copy p{max-width:none}
+  .fairytale-hero .hero-cta{width:100%;max-width:390px}
+  .fairytale-hero .hero-badges{gap:6px}
+}
+
+
+/* Evita che i pulsanti restino visivamente premuti dopo un tap su mobile */
+.clear-catalog-filters,
+.clear-catalog-filters:hover,
+.clear-catalog-filters:active{
+  transform:none!important;
+  rotate:none!important;
+}
+.clear-catalog-filters:active{
+  filter:none!important;
+  box-shadow:0 4px 0 #8882bd20!important;
+}
+@media (hover:none) and (pointer:coarse){
+  .clear-catalog-filters:hover{
+    background:linear-gradient(100deg,#e8e2ff,#e2f5ff);
+    filter:none;
+    box-shadow:0 4px 0 #8882bd20;
+  }
+  .clear-catalog-filters:focus:not(:focus-visible){
+    outline:none;
+  }
+}
+
 </style></head>
 <body>
 <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite"><div class="loading-content"><div class="loading-spinner" aria-hidden="true"></div><div>Stiamo preparando il catalogo…</div></div></div>
@@ -206,12 +278,6 @@ main{max-width:1420px;padding:30px clamp(20px,3vw,48px) 64px}
 <div class="intro"><div><h2>Piccole meraviglie, grandi avventure ✨</h2><p>Trova il prossimo gioco preferito: cerca, esplora e scegli in pochi tocchi.</p></div></div>
 <section class="fairytale-hero" aria-label="Benvenuti nella Favola Infinita">
   <div class="hero-copy"><span class="hero-kicker">✦ UN MONDO TUTTO DA SCOPRIRE ✦</span><h2>Apri la porta alla <em>fantasia!</em></h2><p>Ogni gioco nasconde una storia. Trova il tuo prossimo compagno d'avventure e lascia correre l'immaginazione.</p><button type="button" class="hero-cta" id="discoverBtn">✨ Scopri i giocattoli <span aria-hidden="true">↓</span></button><div class="hero-badges"><span>🌈 Per ogni fantasia</span><span>🧸 Grandi avventure</span><span>🚀 Piccole meraviglie</span></div></div>
-  <div class="hero-art hero-art-portal category-worlds" aria-label="Scegli una categoria di giocattoli">
-    <div class="worlds-heading"><span class="worlds-sparkle" aria-hidden="true">✦</span><div><span class="portal-eyebrow">IL TUO PROSSIMO MONDO</span><h3>Scegli la tua avventura!</h3><p>Tocca una categoria e parti a esplorare</p></div><span class="worlds-sparkle" aria-hidden="true">✧</span></div>
-    <div class="category-tiles" id="categoryTiles"></div>
-    <div class="category-more-wrap" id="categoryMoreWrap" hidden><button type="button" class="category-more" id="categoryMoreBtn" aria-expanded="false">✨ Scopri tutte le categorie</button></div>
-    <div class="worlds-footnote" aria-hidden="true">✦ Ogni giocattolo nasconde una storia ✦</div>
-  </div>
 </section>
 <div class="notice" id="connectionNotice">Collegamento al catalogo online in corso…</div>
 <section class="admin hidden" id="adminPanel">
@@ -231,7 +297,7 @@ main{max-width:1420px;padding:30px clamp(20px,3vw,48px) 64px}
 </section>
 <div class="catalog-heading"><div><span class="mini-kicker">IL TUO SCRIGNO DI MERAVIGLIE</span><h2>Trova il tuo prossimo tesoro <span aria-hidden="true">💫</span></h2></div><p>Filtra, esplora e innamorati del tuo prossimo giocattolo.</p></div>
 <div class="controls"><input id="search" type="search" placeholder="🔎 Cerca un giocattolo o una marca…" aria-label="Cerca prodotto"><select id="categoryFilter" aria-label="Filtra categoria"><option value="">Tutte le categorie</option></select><select id="ageFilter" aria-label="Filtra fascia d’età"><option value="">Tutte le età</option></select><select id="statusFilter" aria-label="Filtra disponibilità"><option value="">Tutte le disponibilità</option><option>Disponibile</option><option>Ultimi pezzi</option><option>Da verificare</option><option>Non disponibile</option></select></div>
-<div class="catalog-actions"><p id="resultsSummary" role="status" aria-live="polite">Preparazione dei giocattoli…</p><button type="button" id="clearCatalogFilters" class="clear-catalog-filters">Mostra tutti i giocattoli</button></div>
+<div class="catalog-actions"><p id="resultsSummary" role="status" aria-live="polite">Preparazione dei giocattoli…</p><button type="button" id="clearCatalogFilters" class="clear-catalog-filters">🧹 Pulisci filtri</button></div>
 <div class="chips" id="chips"></div><div class="grid" id="catalog"></div><div id="loadMoreWrap" class="load-more-wrap" hidden><button type="button" id="loadMoreProducts" class="load-more-products">Carica altri giocattoli</button><p id="loadMoreSummary" aria-live="polite"></p></div><div class="footer">Catalogo dimostrativo · Prezzi e disponibilità da confermare in negozio</div>
 </main>
 <script>
@@ -307,26 +373,13 @@ function normalizzaProdotto(r) {
 }
 
 async function caricaCatalogo(){const n=$('connectionNotice');const loader=$('loadingOverlay');try{const res=await fetch(API_URL,{cache:'no-store'});if(!res.ok)throw new Error('Risposta HTTP '+res.status);const righe=await res.json();if(!Array.isArray(righe))throw new Error('Formato dati non valido');products=righe.map(normalizzaProdotto).filter(p=>p.name);render();loader.style.display='none';if(!products.length){n.textContent='Collegamento riuscito, ma non ci sono ancora prodotti visibili nel foglio Google.';n.classList.add('error');}}catch(err){console.error(err);products=[];render();loader.style.display='none';n.textContent='Non riesco a leggere il catalogo online. Verifica la connessione e riprova a ricaricare la pagina.';n.classList.add('error');}}
-const categoryEmojis={'Prima infanzia':'🧸','Costruzioni':'🧱','Bambole e peluche':'🪆','Giochi da tavolo':'🎲','Veicoli':'🚗','Action figure':'🤖','Creatività':'🎨','Altro':'✨','Giochi educativi':'🧩','Puzzle':'🧩','Outdoor':'🪁','Musica':'🎵'};
-let mostraTutteCategorie=false;
-function drawCategoryTiles(){
- const el=$('categoryTiles');if(!el)return;
- const cats=categories().map(c=>({name:c,count:products.filter(p=>p.visible!==false&&p.category===c).length})).sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'it'));
- const limite=6, visibili=mostraTutteCategorie?cats:cats.slice(0,limite);
- el.innerHTML=visibili.map((item,i)=>{const c=item.name;const icon=categoryEmojis[c]||(['🧸','🚀','🎨','🧩','🏰','🪁'][i%6]);return `<button type="button" class="category-tile ${i>=limite?'category-extra':''}" style="--tile-index:${i}" data-tile-cat="${esc(c)}"><span class="tile-icon" aria-hidden="true">${icon}</span><span class="tile-name">${esc(c)}</span><span class="tile-count">${item.count} ${item.count===1?'giocattolo':'giocattoli'}</span></button>`}).join('');
- const wrap=$('categoryMoreWrap'),btn=$('categoryMoreBtn');if(wrap&&btn){wrap.hidden=cats.length<=limite;btn.setAttribute('aria-expanded',String(mostraTutteCategorie));btn.textContent=mostraTutteCategorie?'Mostra meno categorie':'✨ Scopri tutte le categorie ('+cats.length+')';}
- el.querySelectorAll('[data-tile-cat]').forEach(b=>{b.setAttribute('aria-pressed',String($('categoryFilter').value===b.dataset.tileCat));b.addEventListener('click',()=>selectCategory(b.dataset.tileCat,true));});
-}
-$('categoryMoreBtn')?.addEventListener('click',()=>{mostraTutteCategorie=!mostraTutteCategorie;drawCategoryTiles();});
 $('discoverBtn')?.addEventListener('click',()=> $('catalog').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
 function clearSecondaryFilters(){ $('search').value=''; $('ageFilter').value=''; $('statusFilter').value=''; }
 function selectCategory(category,scrollToResults=false){ clearSecondaryFilters(); visibleProductLimit=PRODUCTS_PER_PAGE; $('categoryFilter').value=category||''; render(); if(scrollToResults){$('catalog').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});} }
-function showAllToys(){ visibleProductLimit=PRODUCTS_PER_PAGE; $('search').value=''; $('categoryFilter').value=''; $('ageFilter').value=''; $('statusFilter').value=''; render(); $('catalog').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}); }
 function categories(){return [...new Set(products.map(p=>p.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'it'))}function ages(){return [...new Set(products.map(p=>String(p.age||'').trim()).filter(Boolean))].sort((a,b)=>parseInt(a)-parseInt(b))}function drawFilters(){const current=$('categoryFilter').value;const currentAge=$('ageFilter').value;$('ageFilter').innerHTML='<option value="">Tutte le età</option>'+ages().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');$('ageFilter').value=currentAge;$('categoryFilter').innerHTML='<option value="">Tutte le categorie</option>'+categories().map(c=>`<option>${esc(c)}</option>`).join('');$('categoryFilter').value=current;$('chips').innerHTML=['Tutti',...categories()].map(c=>`<button class="chip ${($('categoryFilter').value===''&&c==='Tutti')||$('categoryFilter').value===c?'active':''}" data-cat="${c==='Tutti'?'':esc(c)}">${esc(c)}</button>`).join('');$('chips').querySelectorAll('button').forEach(b=>b.onclick=()=>selectCategory(b.dataset.cat,false))}
 
 function render() {
   drawFilters();
-  drawCategoryTiles();
 
   const q = $('search').value.trim().toLocaleLowerCase('it');
   const cat = $('categoryFilter').value;
@@ -345,7 +398,7 @@ function render() {
   const summary=$('resultsSummary');
   if(summary){
     const activeCategory=cat ? ` nella categoria ${cat}` : '';
-    summary.textContent=shown.length===0 ? 'Nessun giocattolo trovato. Prova a cambiare i filtri oppure mostra tutti i giocattoli.' : `${shown.length} ${shown.length===1?'giocattolo trovato':'giocattoli trovati'}${activeCategory}.`;
+    summary.textContent=shown.length===0 ? 'Nessun giocattolo trovato. Prova a modificare o pulire i filtri.' : `${shown.length} ${shown.length===1?'giocattolo trovato':'giocattoli trovati'}${activeCategory}.`;
   }
 
   const visibleProducts = shown.slice(0, visibleProductLimit);
@@ -403,7 +456,7 @@ function render() {
 }
 
 function clearForm(){ $('productForm').reset();$('editId').value='';$('saveBtn').textContent='Salva prodotto';const m=$('formMessage');if(m){m.style.display='none';m.textContent=''}}function drawAdmin(){const list=$('adminList');list.innerHTML='<h3>Prodotti in archivio ('+products.length+')</h3>'+products.map(p=>`<div class="adminitem"><div><strong>${esc(p.name)}</strong><small>${esc(p.brand||'Marca non indicata')} · ${euro(p.price)} · ${esc(p.status)}</small></div><div class="actions"><button class="secondary smallbtn" data-edit="${esc(p.id)}">Modifica</button><button class="secondary smallbtn" data-delete="${esc(p.id)}">Elimina</button></div></div>`).join('');list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.edit);if(!p)return;$('editId').value=p.id;$('name').value=p.name;$('brand').value=p.brand||'';$('category').value=p.category||'Altro';$('age').value=p.age||'';$('price').value=p.price;$('status').value=p.status||'Da verificare';$('description').value=p.description||'';$('emoji').value=p.emoji||'🧸';$('saveBtn').textContent='Aggiorna prodotto';requestAnimationFrame(()=>{ $('productForm').scrollIntoView({behavior:'smooth',block:'start'}); setTimeout(()=> $('name').focus({preventScroll:true}),350) })});list.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{const p=products.find(x=>x.id===b.dataset.delete);if(p&&confirm('Eliminare il prodotto demo “'+p.name+'”?')){products=products.filter(x=>x.id!==p.id);persist();render()}})}
-function saveProduct(){const msg=$('formMessage');msg.style.display='block';try{const oldId=$('editId').value;const name=$('name').value.trim();const priceText=$('price').value.trim().replace(',','.');const price=Number(priceText);if(!name){msg.textContent='Inserisci il nome del prodotto.';$('name').focus();return}if(priceText===''||!Number.isFinite(price)||price<0){msg.textContent='Inserisci un prezzo valido, ad esempio 9,90.';$('price').focus();return}const p={id:oldId||(globalThis.crypto?.randomUUID?crypto.randomUUID():'DEMO-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),name,brand:$('brand').value.trim(),category:$('category').value||'Altro',age:$('age').value.trim(),price,status:$('status').value||'Da verificare',description:$('description').value.trim(),emoji:$('emoji').value||'🧸'};if(oldId){products=products.map(x=>x.id===oldId?p:x)}else{products.push(p)}persist();clearForm();render();msg.style.display='block';msg.textContent=oldId?'Prodotto aggiornato correttamente.':'Prodotto aggiunto correttamente.';}catch(err){console.error(err);msg.textContent='Salvataggio non riuscito in questo browser: '+err.message}}$('saveBtn').addEventListener('click',saveProduct);$('productForm').addEventListener('submit',e=>{e.preventDefault();saveProduct()});$('resetBtn').onclick=clearForm;$('search').oninput=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('categoryFilter').onchange=()=>selectCategory($('categoryFilter').value,false);$('statusFilter').onchange=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('ageFilter').onchange=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('loadMoreProducts')?.addEventListener('click',()=>{visibleProductLimit+=PRODUCTS_PER_PAGE;render()});$('clearCatalogFilters').addEventListener('click',showAllToys);
+function saveProduct(){const msg=$('formMessage');msg.style.display='block';try{const oldId=$('editId').value;const name=$('name').value.trim();const priceText=$('price').value.trim().replace(',','.');const price=Number(priceText);if(!name){msg.textContent='Inserisci il nome del prodotto.';$('name').focus();return}if(priceText===''||!Number.isFinite(price)||price<0){msg.textContent='Inserisci un prezzo valido, ad esempio 9,90.';$('price').focus();return}const p={id:oldId||(globalThis.crypto?.randomUUID?crypto.randomUUID():'DEMO-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)),name,brand:$('brand').value.trim(),category:$('category').value||'Altro',age:$('age').value.trim(),price,status:$('status').value||'Da verificare',description:$('description').value.trim(),emoji:$('emoji').value||'🧸'};if(oldId){products=products.map(x=>x.id===oldId?p:x)}else{products.push(p)}persist();clearForm();render();msg.style.display='block';msg.textContent=oldId?'Prodotto aggiornato correttamente.':'Prodotto aggiunto correttamente.';}catch(err){console.error(err);msg.textContent='Salvataggio non riuscito in questo browser: '+err.message}}$('saveBtn').addEventListener('click',saveProduct);$('productForm').addEventListener('submit',e=>{e.preventDefault();saveProduct()});$('resetBtn').onclick=clearForm;$('search').oninput=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('categoryFilter').onchange=()=>selectCategory($('categoryFilter').value,false);$('statusFilter').onchange=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('ageFilter').onchange=()=>{visibleProductLimit=PRODUCTS_PER_PAGE;render()};$('loadMoreProducts')?.addEventListener('click',()=>{visibleProductLimit+=PRODUCTS_PER_PAGE;render()});$('clearCatalogFilters').addEventListener('click',()=>{visibleProductLimit=PRODUCTS_PER_PAGE;$('search').value='';$('categoryFilter').value='';$('ageFilter').value='';$('statusFilter').value='';render();$('search').focus();});
 function csvEscape(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}$('exportBtn').onclick=()=>{const cols=['id','name','brand','category','age','price','status','description','emoji'];const csv=[cols.join(';'),...products.map(p=>cols.map(k=>csvEscape(p[k])).join(';'))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='catalogo-giocattoli-demo.csv';a.click();URL.revokeObjectURL(a.href)};$('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const text=await f.text();const rows=text.replace(/^\ufeff/,'').split(/\r?\n/).filter(Boolean);const parse=line=>{const out=[];let v='',quoted=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'&&quoted&&line[i+1]==='"'){v+='"';i++}else if(c==='"')quoted=!quoted;else if(c===';'&&!quoted){out.push(v);v=''}else v+=c}out.push(v);return out};const heads=parse(rows.shift()).map(x=>x.trim());const incoming=rows.map(line=>{const a=parse(line),o={};heads.forEach((h,i)=>o[h]=a[i]||'');return {id:o.id||'DEMO-'+Date.now()+Math.random(),name:o.name||o['Nome prodotto']||'',brand:o.brand||o['Marca']||'',category:o.category||o['Categoria']||'Altro',age:o.age||o['Età consigliata']||'',price:Number(String(o.price||o['Prezzo (€)']||'0').replace(',','.')),status:o.status||o['Disponibilità']||'Da verificare',description:o.description||o['Descrizione']||'',emoji:o.emoji||'🧸'}}).filter(p=>p.name);if(!incoming.length)throw new Error('Nessun prodotto valido trovato');if(confirm('Importare '+incoming.length+' prodotti? OK = sostituisci catalogo demo, Annulla = aggiungi')){if(!confirm('Confermi di sostituire gli articoli presenti?'))products.push(...incoming);else products=incoming}else products.push(...incoming);persist();render();alert('Importazione completata. Controlla i dati prima di pubblicare.')}catch(err){alert('Importazione non riuscita: '+err.message)}e.target.value=''};
 render();
 caricaCatalogo();
